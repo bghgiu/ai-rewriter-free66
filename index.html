@@ -40,7 +40,7 @@
             document.getElementById("result").innerText = "Processing...";
 
             // 你换成自己的 LLM 接口即可
-                    const res = await fetch("/api/proxy", {
+                    const res = await fetch("/API/proxy", {
                 method:"POST",
                 headers:{"Content-Type":"application/json"},
                 body:JSON.stringify({
