@@ -29,6 +29,8 @@
 
     <script>
         let count = 0;
+        // 你的DeepSeek密钥，直接写在前端（不安全！）
+        const DEEPSEEK_KEY = "sk-037f1c11fec74ee286d73954a4986544";
         async function rewrite() {
             if(count >= 3) {
                 document.getElementById("result").innerText = "Daily limit reached. DM Telegram for unlimited.";
@@ -39,17 +41,21 @@
 
             document.getElementById("result").innerText = "Processing...";
 
-            // 你换成自己的 LLM 接口即可
-                    const res = await fetch("/API/proxy", {
+            // 直连DeepSeek官方接口
+            const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
                 method:"POST",
-                headers:{"Content-Type":"application/json"},
+                headers:{
+                    "Content-Type":"application/json",
+                    "Authorization": `Bearer ${DEEPSEEK_KEY}`
+                },
                 body:JSON.stringify({
+                    model: "deepseek-chat",
                     messages: [{role:"user",content:"Paraphrase this text: "+text}]
                 })
             });
 
             const data = await res.json();
-            let out = data.choices?.[0]?.message?.content || "Error";
+            let out = data.choices?.[0]?.message?.content || "Error：接口调用失败，密钥或额度异常";
             document.getElementById("result").innerText = out;
             count++;
         }
