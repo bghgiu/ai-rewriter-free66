@@ -2,99 +2,296 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Free AI Paraphraser</title>
+    <title>AI Paraphraser Pro | 高级文本改写</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        *{box-sizing:border-box;margin:0;padding:0;font-family:Arial}
-        :root{--bg:#f9f9f9;--card:#fff;--text:#111;--border:#ddd;--primary:#007bff}
-        .dark{--bg:#1a1a1a;--card:#282828;--text:#eee;--border:#444}
-        body{max-width:800px;margin:40px auto;padding:0 20px;background:var(--bg);color:var(--text);transition:0.3s}
-        .box{background:var(--card);padding:24px;border-radius:12px;box-shadow:0 2px 12px #00000010}
-        textarea{width:100%;height:180px;padding:12px;margin:10px 0;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);resize:vertical}
-        .btn-row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
-        button{background:var(--primary);color:white;border:none;padding:12px 20px;border-radius:8px;cursor:pointer;transition:0.2s}
-        button.gray{background:#6c757d}
-        .result{margin-top:20px;padding:16px;background:var(--border);border-radius:8px;min-height:100px;white-space:pre-wrap}
-        .tg{margin-top:20px;text-align:center;color:var(--text)}
-        .tg a{color:var(--primary);font-weight:bold}
-        .tip{color:#888;font-size:14px;margin:8px 0}
-        .loading{display:inline-block;width:16px;height:16px;border:3px solid #fff3;border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite}
-        @keyframes spin{to{transform:rotate(360deg)}}
+        *{box-sizing:border-box;margin:0;padding:0;font-family: 'Segoe UI', Arial}
+        :root {
+            --bg: #f8f9fc;
+            --card: #ffffff;
+            --text: #222;
+            --border: #ddd;
+            --primary: #2563eb;
+            --gray: #64748b;
+        }
+        .dark {
+            --bg: #111827;
+            --card: #1f2937;
+            --text: #f3f4f6;
+            --border: #374151;
+            --primary: #3b82f6;
+            --gray: #9ca3af;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            max-width:900px;
+            margin:40px auto;
+            padding:0 20px;
+            transition: all 0.3s;
+        }
+        .container {
+            background: var(--card);
+            padding:28px;
+            border-radius:16px;
+            box-shadow:0 4px 12px rgba(0,0,0,0.05);
+        }
+        .header {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:16px;
+        }
+        .header h1 {
+            font-size:22px;
+            color:var(--primary);
+        }
+        #themeBtn {
+            padding:8px 14px;
+            border-radius:8px;
+            background:var(--gray);
+            color:white;
+            border:none;
+            cursor:pointer;
+        }
+
+        .info {
+            color:var(--gray);
+            font-size:14px;
+            margin-bottom:12px;
+        }
+
+        .mode-select {
+            margin:12px 0;
+            padding:10px;
+            border-radius:8px;
+            border:1px solid var(--border);
+            background:var(--card);
+            color:var(--text);
+            width:100%;
+        }
+
+        textarea {
+            width:100%;
+            height:200px;
+            padding:14px;
+            border-radius:10px;
+            border:1px solid var(--border);
+            background:var(--card);
+            color:var(--text);
+            font-size:15px;
+            resize:vertical;
+            margin-bottom:12px;
+        }
+
+        .btn-group {
+            display:flex;
+            gap:10px;
+            flex-wrap:wrap;
+            margin-bottom:16px;
+        }
+        button {
+            padding:12px 18px;
+            border-radius:10px;
+            border:none;
+            background:var(--primary);
+            color:white;
+            font-weight:500;
+            cursor:pointer;
+            transition:0.2s;
+        }
+        button.gray { background:var(--gray); }
+        button:disabled { opacity:0.6; cursor:not-allowed; }
+
+        .result-box {
+            padding:16px;
+            background:var(--border);
+            border-radius:10px;
+            min-height:120px;
+            white-space:pre-wrap;
+            line-height:1.6;
+        }
+
+        .history {
+            margin-top:24px;
+            padding-top:16px;
+            border-top:1px solid var(--border);
+        }
+        .history h3 { font-size:16px; margin-bottom:10px; }
+        .history-item {
+            padding:10px;
+            background:var(--border);
+            border-radius:8px;
+            margin-bottom:8px;
+            font-size:14px;
+            cursor:pointer;
+        }
+
+        .loading {
+            display:inline-block;
+            width:16px; height:16px;
+            border:3px solid rgba(255,255,255,0.2);
+            border-top-color:white;
+            border-radius:50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform:rotate(360deg); } }
+
+        .footer {
+            text-align:center;
+            margin-top:30px;
+            font-size:14px;
+            color:var(--gray);
+        }
+        .footer a {
+            color:var(--primary);
+            font-weight:bold;
+        }
     </style>
 </head>
 <body>
-    <div class="box">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-            <h2>Free AI Paraphraser | 文本改写工具</h2>
-            <button id="themeBtn" class="gray">切换深色模式</button>
-        </div>
-        <p class="tip">免费每日3次使用，无需登录 | <span id="leftCount">剩余3次</span></p>
-        <textarea id="input" placeholder="粘贴需要改写的英文文本..." maxlength="1200"></textarea>
-        <div class="btn-row">
-            <button onclick="rewrite()">意译改写</button>
-            <button class="gray" onclick="clearAll()">清空全部</button>
-            <button class="gray" onclick="copyResult()">复制改写结果</button>
-        </div>
-        <div class="result" id="result"></div>
-    </div>
-    <div class="tg">
-        无限额度 & API密钥咨询 → Telegram: <a href="" target="_blank">@AiRewriteSupport</a>
+
+<div class="container">
+    <div class="header">
+        <h1>AI Paraphraser Pro</h1>
+        <button id="themeBtn">深色模式</button>
     </div>
 
-    <script>
-        let count = 0;
-        const resultDom = document.getElementById('result');
-        const leftCountDom = document.getElementById('leftCount');
-        const inputDom = document.getElementById('input');
-        // 剩余次数实时更新
-        function refreshCount(){
-            leftCountDom.innerText = `剩余${3-count}次`;
-        }
-        refreshCount();
+    <div class="info">
+        每日免费次数：<span id="left">3</span> 次
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+        已输入字数：<span id="wordCount">0</span>
+    </div>
 
-        // 清空输入输出
-        function clearAll(){
-            inputDom.value = '';
-            resultDom.innerText = '';
-        }
-        // 复制结果
-        async function copyResult(){
-            if(!resultDom.innerText || resultDom.innerText.includes('Processing')) return alert('暂无可复制内容');
-            await navigator.clipboard.writeText(resultDom.innerText);
-            alert('复制成功！');
-        }
-        // 深色浅色切换
-        document.getElementById('themeBtn').onclick = function(){
-            document.body.classList.toggle('dark');
-            this.innerText = document.body.classList.contains('dark') ? '切换浅色模式' : '切换深色模式';
-        }
+    <select class="mode-select" id="mode">
+        <option value="default">🔹 标准改写</option>
+        <option value="academic">🎓 学术降重</option>
+        <option value="concise">✂️ 精简压缩</option>
+        <option value="business">💼 商务正式</option>
+        <option value="simple">🗣️ 口语通俗</option>
+    </select>
 
-        async function rewrite() {
-            if(count >= 3) {
-                resultDom.innerText = "Daily limit reached. DM Telegram for unlimited.";
-                return;
-            }
-            const text = inputDom.value.trim();
-            if(!text) return alert("请输入文本");
-            // 加载动画
-            resultDom.innerHTML = `<span class="loading"></span> 正在生成改写内容...`;
+    <textarea id="input" placeholder="请输入需要改写的英文文本..." maxlength="1500"></textarea>
 
-            try{
-                const res = await fetch("/api/proxy", {
-                    method:"POST",
-                    headers:{"Content-Type":"application/json"},
-                    body:JSON.stringify({
-                        messages: [{role:"user",content:"Paraphrase this text: "+text}]
-                    })
-                });
-                const data = await res.json();
-                let out = data.choices?.[0]?.message?.content || "Error：接口调用失败，请稍后重试";
-                resultDom.innerText = out;
-                count++;
-                refreshCount();
-            }catch(err){
-                resultDom.innerText = "网络超时，请重新尝试";
-            }
+    <div class="btn-group">
+        <button onclick="startRewrite()">开始改写</button>
+        <button class="gray" onclick="clearAll()">清空内容</button>
+        <button class="gray" onclick="copyResult()">复制结果</button>
+    </div>
+
+    <div class="result-box" id="result"></div>
+
+    <div class="history" id="historySection">
+        <h3>📜 改写历史</h3>
+        <div id="historyList"></div>
+    </div>
+</div>
+
+<div class="footer">
+    Unlimited access → Telegram: <a href="https://t.me/AiRewriteSupport" target="_blank">@AiRewriteSupport</a>
+</div>
+
+<script>
+    let count = 0;
+    const maxCount = 3;
+    const result = document.getElementById('result');
+    const input = document.getElementById('input');
+    const left = document.getElementById('left');
+    const historyList = document.getElementById('historyList');
+    let history = JSON.parse(localStorage.getItem('rewriteHistory')) || [];
+
+    updateLeft();
+    loadHistory();
+    wordCount();
+
+    input.addEventListener('input', wordCount);
+    function wordCount(){
+        document.getElementById('wordCount').innerText = input.value.length;
+    }
+
+    function updateLeft(){
+        left.innerText = maxCount - count;
+    }
+
+    function clearAll(){
+        input.value = '';
+        result.innerText = '';
+        wordCount();
+    }
+
+    async function copyResult(){
+        if(!result.innerText || result.innerText.includes('正在') || result.innerText.includes('Processing')) return alert('暂无内容可复制');
+        await navigator.clipboard.writeText(result.innerText);
+        alert('复制成功！');
+    }
+
+    document.getElementById('themeBtn').onclick = () => {
+        document.body.classList.toggle('dark');
+        document.getElementById('themeBtn').innerText = document.body.classList.contains('dark') ? '浅色模式' : '深色模式';
+    };
+
+    function getPrompt(mode, text){
+        const prompts = {
+            default: `Paraphrase this text naturally: ${text}`,
+            academic: `Paraphrase this text into academic formal style, avoid plagiarism: ${text}`,
+            concise: `Paraphrase this text and make it shorter and clear: ${text}`,
+            business: `Paraphrase this text into professional business style: ${text}`,
+            simple: `Paraphrase this text into simple easy English: ${text}`
+        };
+        return prompts[mode] || prompts.default;
+    }
+
+    async function startRewrite(){
+        if(count >= maxCount){
+            result.innerText = 'Daily limit reached. Contact Telegram for unlimited.';
+            return;
         }
-    </script>
+        const text = input.value.trim();
+        if(!text) return alert('请输入内容');
+        const mode = document.getElementById('mode').value;
+        const prompt = getPrompt(mode, text);
+
+        result.innerHTML = '<span class="loading"></span> 正在改写中...';
+
+        try {
+            const res = await fetch('/api/proxy', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    messages: [{ role: 'user', content: prompt }]
+                })
+            });
+            const data = await res.json();
+            const output = data.choices?.[0]?.message?.content || 'Error：改写失败';
+            result.innerText = output;
+
+            history.unshift({ input:text, output, mode, time:new Date().toLocaleString() });
+            if(history.length > 10) history = history.slice(0,10);
+            localStorage.setItem('rewriteHistory', JSON.stringify(history));
+            loadHistory();
+
+            count++;
+            updateLeft();
+        } catch(e){
+            result.innerText = '请求超时，请重试';
+        }
+    }
+
+    function loadHistory(){
+        historyList.innerHTML = '';
+        history.forEach((item, i) => {
+            const div = document.createElement('div');
+            div.className = 'history-item';
+            div.innerText = `${item.time} · ${item.mode} · ${item.input.slice(0,30)}...`;
+            div.onclick = () => {
+                input.value = item.input;
+                result.innerText = item.output;
+                wordCount();
+            };
+            historyList.appendChild(div);
+        });
+    }
+</script>
 </body>
 </html>
