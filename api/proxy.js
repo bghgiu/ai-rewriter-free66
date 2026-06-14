@@ -4,14 +4,17 @@ export default async function handler(req) {
         return new Response("Only POST requests allowed", { status: 405 });
     }
     try {
-        // 接收前端传来的改写prompt
         const { messages } = await req.json();
-        // 调用DeepSeek官方接口
+        // 密钥从Vercel环境变量读取，不会暴露给前端
+        const DEEPSEEK_KEY = process.env.DEEPSEEK_KEY;
+        if (!DEEPSEEK_KEY) {
+            return Response.json({ error: "API Key not configured" }, { status: 500 });
+        }
         const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${process.env.DEEPSEEK_KEY}`
+                "Authorization": `Bearer ${DEEPSEEK_KEY}`
             },
             body: JSON.stringify({
                 model: "deepseek-chat",
