@@ -40,11 +40,10 @@
             document.getElementById("result").innerText = "Processing...";
 
             // 你换成自己的 LLM 接口即可
-            const res = await fetch("https://你的转发接口", {
+                    const res = await fetch("/api/proxy", {
                 method:"POST",
                 headers:{"Content-Type":"application/json"},
                 body:JSON.stringify({
-                    model: "gpt-3.5-turbo",
                     messages: [{role:"user",content:"Paraphrase this text: "+text}]
                 })
             });
