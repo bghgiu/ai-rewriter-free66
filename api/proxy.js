@@ -1,29 +1,30 @@
-export default async function handler(req) {
-    // 仅允许POST请求
-    if (req.method !== "POST") {
-        return new Response("Only POST requests allowed", { status: 405 });
+export default async function handler(req, res) {
+  // 只允许POST
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Only POST allowed" });
+  }
+  try {
+    const { messages } = req.body;
+    const key = process.env.DEEPSEEK_KEY;
+    if (!key) {
+      return res.status(500).json({ error: "Missing API Key" });
     }
-    try {
-        const { messages } = await req.json();
-        // 密钥从Vercel环境变量读取，不会暴露给前端
-        const DEEPSEEK_KEY = process.env.DEEPSEEK_KEY;
-        if (!DEEPSEEK_KEY) {
-            return Response.json({ error: "API Key not configured" }, { status: 500 });
-        }
-        const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${DEEPSEEK_KEY}`
-            },
-            body: JSON.stringify({
-                model: "deepseek-chat",
-                messages: messages
-            })
-        });
-        const data = await res.json();
-        return Response.json(data);
-    } catch (err) {
-        return Response.json({ error: "API request failed" }, { status: 500 });
-    }
+
+    const resp = await fetch("https://api.deepseek.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${key}`
+      },
+      body: JSON.stringify({
+        model: "deepseek-chat",
+        messages: messages
+      })
+    });
+
+    const data = await resp.json();
+    res.status(200).json(data);
+  } catch (err) {
+    res.status(500).json({ error: "Request timeout or failed" });
+  }
 }
